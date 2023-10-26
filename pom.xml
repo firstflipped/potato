@@ -11,6 +11,7 @@
         <module>potato-system</module>
         <module>potato-dependencies</module>
         <module>potato-framework</module>
+        <module>potato-gateway</module>
     </modules>
     <packaging>pom</packaging>
 
