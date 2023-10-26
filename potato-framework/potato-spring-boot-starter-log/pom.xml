@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.flipped</groupId>
+        <artifactId>potato-framework</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <artifactId>potato-spring-boot-starter-log</artifactId>
+
+    <dependencies>
+        <!-- 公共依赖包 -->
+        <dependency>
+            <groupId>com.flipped</groupId>
+            <artifactId>potato-common</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <!-- Spring相关 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>
