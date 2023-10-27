@@ -1,0 +1,105 @@
+version: '3.3'
+
+services:
+  mysql:
+    image: mysql
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      # 目录挂载
+      - D:\Service\Docker\MySQL\data:/var/lib/mysql
+      - D:\Service\Docker\MySQL\conf:/etc/mysql/conf.d
+      - D:\Service\Docker\MySQL\log:/var/log/mysql
+    environment:
+      TZ: Asia/Shanghai
+      MYSQL_ROOT_PASSWORD: laughingather
+      # 初始化数据库(后续的初始化sql会在这个库执行)
+      MYSQL_DATABASE: nacos_config
+      # 初始化用户(不能是root会报错, 后续需要给新用户赋予权限)
+      MYSQL_USER: nacos
+      # 用户密码
+      MYSQL_PASSWORD: laughingather
+
+  nacos:
+    image: nacos/nacos-server
+    container_name: nacos
+    ports:
+      - "8848:8848"
+      - "9848:9848"
+      - "9849:9849"
+    volumes:
+      # 挂载宿主机，后面为对应容器内部地址
+      - D:\Service\Docker\Nacos\logs:/home/nacos/logs
+      - D:\Service\Docker\Nacos\data:/home/nacos/data
+    # 设置环境变量,相当于docker run命令中的-e
+    environment:
+      # 单机模式启动
+      MODE: standalone
+      NACOS_AUTH_ENABLE: true
+      SPRING_DATASOURCE_PLATFORM: mysql
+      MYSQL_SERVICE_HOST: mysql
+      MYSQL_SERVICE_USER: nacos
+      MYSQL_SERVICE_PASSWORD: laughingather
+      MYSQL_SERVICE_DB_NAME: nacos_config
+      MYSQL_SERVICE_DB_PARAM: characterEncoding=utf8&connectTimeout=100000&socketTimeout=300000&autoReconnect=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      # nacos1.4.0版本启动后，占用内存过多，配置JVM参数
+      JVM_XMS: 512m
+      JVM_XMX: 512m
+      JVM_XMN: 512m
+    depends_on:
+      - mysql
+    links:
+      - mysql:mysql
+  
+  mongo:
+    image: mongo:4.4.19-rc2
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      # 挂载目录
+      - D:\Service\Docker\Mongo\data:/data/db
+      - D:\Service\Docker\Mongo\logs:/var/log/mongodb
+    # 初始化管理员用户名和密码
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: laughingather
+    tty: true
+    # 覆盖容器启动后默认执行的命令
+    command: mongod --auth
+
+  elasticsearch:
+    image: elasticsearch:7.14.2
+    container_name: elasticsearch
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - D:\Service\Docker\Elasticsearch\data:/usr/share/elasticsearch/data
+      - D:\Service\Docker\Elasticsearch\plugins:/usr/share/elasticsearch/plugins
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - ELASTIC_PASSWORD=laughingather
+      - xpack.security.enabled=true
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    environment:
+      TZ: Asia/Shanghai
+    volumes:
+      - D:\Service\Docker\Redis\data:/data
+      - D:\Service\Docker\Redis\conf\redis.conf:/etc/redis/redis.conf
+      - D:\Service\Docker\Redis\logs:/logs
+    command: [ "redis-server","/etc/redis/redis.conf" ]
+
+# 加入本地已有的网络配置，如果不进行配置的话会默认生成一个网络
+networks:
+  default:
+    external:
+      name: potato
+

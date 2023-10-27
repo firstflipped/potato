@@ -1,0 +1,91 @@
+自定义网络
+docker network create docker-net
+
+MySQL服务
+docker run \
+        --name mysql \
+        --privileged=true \
+        --network docker-net \
+        -p 3306:3306 \
+        -v /Users/flipped/Server/Docker/MySQL/data:/var/lib/mysql \
+        -v /Users/flipped/Server/Docker/MySQL/conf:/etc/mysql/conf.d \
+        -v /Users/flipped/Server/Docker/MySQL/log:/var/log/mysql \
+        -e MYSQL_ROOT_PASSWORD=laughingather \
+        -d mysql:latest
+
+Nacos服务
+docker run \
+        --name nacos \
+        --network docker-net \
+        -p 8848:8848 \
+        -p 9848:9848 \
+        -p 9849:9849 \
+        -e MODE=standalone \
+        -e NACOS_AUTH_ENABLE=true \
+        -e TZ='Asia/Shanghai' \
+        -v /Users/flipped/Server/Docker/Nacos/logs:/home/nacos/logs \
+        -v /Users/flipped/Server/Docker/Nacos/data:/home/nacos/data \
+        -v /Users/flipped/Server/Docker/Nacos/conf:/home/nacos/conf \
+        -d nacos/nacos-server:v2.2.3-slim
+
+// 挂载文件的方式启动
+docker run \
+        --name nacos \
+        --network docker-net \
+        -p 8848:8848 \
+        -p 9848:9848 \
+        -p 9849:9849 \
+        -e MODE=standalone \
+        -e NACOS_AUTH_ENABLE=true \
+        -e TZ='Asia/Shanghai' \
+        -v /Users/flipped/Server/Docker/Nacos/logs:/home/nacos/logs \
+        -v /Users/flipped/Server/Docker/Nacos/data:/home/nacos/data \
+        -v /Users/flipped/Server/Docker/Nacos/conf:/home/nacos/conf \
+        -d nacos/nacos-server:v2.2.3-slim
+
+
+Elasticsearch服务
+docker run \
+        --name elasticsearch \
+        --privileged \
+        --network docker-net \
+        -p 9200:9200 \
+        -p 9300:9300 \
+        -e "ES_JAVA_OPTS=-Xms512m -Xmx512m" \
+        -e "discovery.type=single-node" \
+        -e "ELASTIC_PASSWORD=laughingather" \
+        -e "xpack.security.enabled=true" \
+        -v /Users/flipped/Server/Docker/Elasticsearch/data:/usr/share/elasticsearch/data \
+        -v /Users/flipped/Server/Docker/Elasticsearch/plugins:/usr/share/elasticsearch/plugins \
+        -v /Users/flipped/Server/Docker/Elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
+        -d elasticsearch:7.14.2
+
+Redis服务
+docker run \
+        --name redis \
+        -p 6379:6379 \
+        -d redis \
+        --appendonly yes
+        --requirepass "laughingather"
+
+Mongo服务
+docker run \
+        --name mongo \
+        --network docker-net \
+        -p 27017:27017 \
+        -v /Users/flipped/Server/Docker/Mongo/data:/data/db \
+        -v /Users/flipped/Server/Docker/Mongo/conf:/etc/mongo \
+        -e MONGO_INITDB_ROOT_USERNAME=root \
+        -e MONGO_INITDB_ROOT_PASSWORD=laughingather \
+        -d mongo:4.4.19-rc2
+
+Nginx服务
+docker run \
+        --name nginx \
+        --network docker-net \
+        -p 80:80 \
+        -v /Users/flipped/Server/Docker/Nginx/nginx.conf:/etc/nginx/nginx.conf \
+        -v /Users/flipped/Server/Docker/Nginx/logs:/var/log/nginx \
+        -v /Users/flipped/Server/Docker/Nginx/html:/usr/share/nginx/html \
+        -v /Users/flipped/Server/Docker/Nginx/conf.d:/etc/nginx/conf.d \
+        -d nginx
